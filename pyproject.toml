@@ -1,0 +1,32 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+# name it as your package name
+name = "quanttide-example-of-python-project"
+# semetric versions
+version = "0.1.0-alpha.1"
+# describe the package within one sentence
+description = "QuantTide Example of Python Project"
+authors = [{name = "QuantTide Inc.", email = "opensource@quanttide.com"}]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+requires-python = '>=3.10'
+dependencies = [
+    "dynaconf>=3.2.5",
+]
+# dynamic = ["version"]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=8.2.2",
+]
