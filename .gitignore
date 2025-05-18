@@ -151,3 +151,4 @@ cython_debug/
 
 # data
 data/
+*.yml
