@@ -117,20 +117,26 @@ class CPICalculator:
             aggfunc='first'
         ).ffill(axis=1)
 
-        base_prices = price_pivot[start_date].rename('base_price')
-
-        merged_data = self.products.merge(
-            base_prices,
-            left_on='product_id',
-            right_index=True
-        ).merge(
-            leaf_categories,
-            on='category_id'
-        )
-
         cpi_series = pd.Series(index=all_dates, dtype='float64')
 
-        for current_date in all_dates:
+        for i, current_date in enumerate(all_dates):
+            if i == 0:
+                # 第一天没有前一天，跳过或使用其他逻辑
+                cpi_series[current_date] = 1.0  # 假设第一天的CPI为1.0
+                continue
+
+            previous_date = all_dates[i - 1]
+            base_prices = price_pivot[previous_date].rename('base_price')
+
+            merged_data = self.products.merge(
+                base_prices,
+                left_on='product_id',
+                right_index=True
+            ).merge(
+                leaf_categories,
+                on='category_id'
+            )
+
             current_prices = price_pivot[current_date].rename('current_price')
             daily_data = merged_data.merge(
                 current_prices,
