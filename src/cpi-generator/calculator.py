@@ -117,26 +117,20 @@ class CPICalculator:
             aggfunc='first'
         ).ffill(axis=1)
 
+        base_prices = price_pivot[start_date].rename('base_price')
+
+        merged_data = self.products.merge(
+            base_prices,
+            left_on='product_id',
+            right_index=True
+        ).merge(
+            leaf_categories,
+            on='category_id'
+        )
+
         cpi_series = pd.Series(index=all_dates, dtype='float64')
 
-        for i, current_date in enumerate(all_dates):
-            if i == 0:
-                # 第一天没有前一天，跳过或使用其他逻辑
-                cpi_series[current_date] = 1.0  # 假设第一天的CPI为1.0
-                continue
-
-            previous_date = all_dates[i - 1]
-            base_prices = price_pivot[previous_date].rename('base_price')
-
-            merged_data = self.products.merge(
-                base_prices,
-                left_on='product_id',
-                right_index=True
-            ).merge(
-                leaf_categories,
-                on='category_id'
-            )
-
+        for current_date in all_dates:
             current_prices = price_pivot[current_date].rename('current_price')
             daily_data = merged_data.merge(
                 current_prices,
@@ -163,13 +157,11 @@ class CPICalculator:
         return cpi_series.astype('float64').round(4)
 
 
-def plot_cpi_trend(cpi_series: pd.Series):
-    """绘制 CPI 趋势图"""
-    pd.DataFrame(cpi_series).to_csv('cpi_data.csv')
-    visualize()
-#
-#
-# # 示例调用
+# def plot_cpi_trend(cpi_series: pd.Series):
+#     """绘制 CPI 趋势图"""
+#     visualize(pd.DataFrame(cpi_series))
+
+# 示例调用
 # if __name__ == '__main__':
 #     settings.from_env('prod')
 #     calculator = CPICalculator(db_config=settings.CLICKHOUSE)
